@@ -1,0 +1,1 @@
+# hawkular-smoke-test
