@@ -1,0 +1,7 @@
+{
+    "type": "URL",
+    "id": "hawkular_web",
+      "parameters": {
+      "url": "http://redhat.com"
+    }
+}
