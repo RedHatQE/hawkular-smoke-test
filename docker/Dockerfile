@@ -1,6 +1,6 @@
 FROM jboss/base-jdk:8
 
-MAINTAINER Matt Mahoney <mmahoney@redhat.com
+MAINTAINER Matt Mahoney <mmahoney@redhat.com>
 
 USER root
 RUN echo "root:redhat" | chpasswd
@@ -29,4 +29,4 @@ export H=`find . -name "apache-jmeter*.zip"`; /usr/bin/unzip $H -d /home/hudson 
 mv /home/hudson/apache-jmeter-* /home/hudson/apache-jmeter ; rm -rf /home/hudson/www.webhosting*
 
 WORKDIR /home/hudson/hawkular-smoke-test/tests
-CMD ["/home/hudson/hawkular-smoke-test/tests/testRunner.sh"]
+CMD /bin/bash /home/hudson/hawkular-smoke-test/tests/testRunner.sh
