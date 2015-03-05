@@ -28,6 +28,12 @@ do
   shift
 done
 
+# Override if ENV IP is set
+if [ -n "$IP" ]
+then
+    ip=$IP
+fi
+
 if [ -z "$testList" ]
 then
     testList=`ls ./*.sh`

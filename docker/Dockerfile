@@ -28,5 +28,6 @@ RUN cd /home/hudson; wget -r -l0 --no-parent -A .zip http://www.webhostingreview
 export H=`find . -name "apache-jmeter*.zip"`; /usr/bin/unzip $H -d /home/hudson ; chmod -R 766 /home/hudson/apache-jmeter*  ; \
 mv /home/hudson/apache-jmeter-* /home/hudson/apache-jmeter ; rm -rf /home/hudson/www.webhosting*
 
+USER root
 WORKDIR /home/hudson/hawkular-smoke-test/tests
 CMD /bin/bash /home/hudson/hawkular-smoke-test/tests/testRunner.sh
