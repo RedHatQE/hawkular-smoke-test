@@ -1,5 +1,4 @@
 #!/bin/bash
-echo on
 
 ip=$1
 exitcode="1"
@@ -34,4 +33,4 @@ else
     exit 1
 fi
 
-exit $exitcode"
+exit "$exitcode"

@@ -20,7 +20,7 @@ CMD ["/usr/sbin/sshd -D"]
 
 USER hudson
 
-RUN git clone https://github.com/RedHatQE/hawkular-smoke-test.git
+RUN cd /home/hudson; git clone https://github.com/RedHatQE/hawkular-smoke-test.git
 
 # Install JMeter
 RUN cd /home/hudson; wget -r -l0 --no-parent -A .zip http://www.webhostingreviewjam.com/mirror/apache/jmeter/binaries/ ; \
