@@ -16,10 +16,11 @@ RUN sed -ri 's/#PermitRootLogin yes/PermitRootLogin yes/g' /etc/ssh/sshd_config
 RUN sed -ri 's/UsePAM yes/#UsePAM yes/g' /etc/ssh/sshd_config
 RUN sed -ri 's/#UsePAM no/UsePAM no/g' /etc/ssh/sshd_config
 EXPOSE 22
-CMD ["/usr/sbin/sshd -D"]
+RUN /usr/sbin/sshd -D &
 
 USER hudson
 
+ENV PATH .:$PATH
 RUN cd /home/hudson; git clone https://github.com/RedHatQE/hawkular-smoke-test.git
 
 # Install JMeter
@@ -27,4 +28,5 @@ RUN cd /home/hudson; wget -r -l0 --no-parent -A .zip http://www.webhostingreview
 export H=`find . -name "apache-jmeter*.zip"`; /usr/bin/unzip $H -d /home/hudson ; chmod -R 766 /home/hudson/apache-jmeter*  ; \
 mv /home/hudson/apache-jmeter-* /home/hudson/apache-jmeter ; rm -rf /home/hudson/www.webhosting*
 
-USER root
+WORKDIR /home/hudson/hawkular-smoke-test/tests
+CMD ["/home/hudson/hawkular-smoke-test/tests/testRunner.sh"]
