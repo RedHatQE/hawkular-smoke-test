@@ -1,4 +1,6 @@
-#/bin/bash
+#!/bin/bash
+
+prog="testRunner.sh"
 
 # Space separated list of tests to run.
 # Default is to run all tests.
@@ -36,29 +38,33 @@ fi
 
 if [ -z "$testList" ]
 then
-    testList=`ls ./*.sh`
+    testList=`ls *.sh`
 fi
 
 echo "testList: $testList"
 
 for test in $testList
 do
-    echo "Checking test: $test"
-    if [[ "$test" != *"$0"* ]]
+    echo "Checking test: $tes"
+    if [[ "$test" == *"$prog"* ]]
     then
-	cmd="./$test $ip"
+        echo "Skipping: $test"
+    else
+    cmd="$test $ip"
         echo "Running test: $cmd"
         $cmd
         result=$?
 
         if [[ "$result" != "0" ]]
         then
-	    echo "Failure - test: $cmd"
+        echo "Failure - test: $cmd"
             exitcode="1"
-	else
-	    echo "Passed - test: $cmd"
+    else
+        echo "Passed - test: $cmd"
         fi
     fi
 done
 
 exit "$exitcode"
+
+
