@@ -1,8 +1,7 @@
-FROM jboss/base-jdk:8
+FROM hawkular/docker-maven
+MAINTAINER Matt Mahoney <mmahoney@redhat.com> USER root
 
-MAINTAINER Matt Mahoney <mmahoney@redhat.com>
-
-USER root
+ENV PATH .:$PATH
 RUN echo "root:redhat" | chpasswd
 RUN yum -y install wget git openssh-server httpd supervisor
 
@@ -21,22 +20,31 @@ RUN echo "Hawkular Test Results Directory" > /var/www/html/hawkular-test-results
 RUN printf "\n;Hawkular\n[program:sshd]\ncommand=/bin/bash -c /usr/sbin/sshd\n[program:httpd]\ncommand=/bin/bash -c "/usr/sbin/httpd -DFOREGROUND"\n" \\
     >> /etc/supervisord.conf
 
-USER hudson
-
-ENV PATH .:$PATH
-RUN cd /home/hudson; git clone https://github.com/RedHatQE/hawkular-smoke-test.git
-
-# Script 1) starts sshd and httpd (via supervisord), and then 2) run tests
-RUN printf "\n/usr/bin/supervisord\ncd /home/hudson/hawkular-smoke-test/tests; testRunner.sh" > /home/hudson/runTests.sh; chmod 766 /home/hudson/runTests.sh
 EXPOSE 22 80
 
+USER hudson
+WORKDIR /home/hudson
+
+ENV PATH .:$PATH
+RUN git clone https://github.com/RedHatQE/hawkular-smoke-test.git
+RUN git clone https://mattmahoneyrh@github.com/redhatqe/hawkular-rest-test
+
 # Install JMeter
-# RUN cd /home/hudson; wget -r -l0 --no-parent -A .zip http://www.webhostingreviewjam.com/mirror/apache/jmeter/binaries/ ; \
-# export H=`find . -name "apache-jmeter*.zip"`; /usr/bin/unzip $H -d /home/hudson ; chmod -R 766 /home/hudson/apache-jmeter*  ; \
-# mv /home/hudson/apache-jmeter-* /home/hudson/apache-jmeter ; rm -rf /home/hudson/www.webhosting*
+RUN cd /home/hudson; wget http://mirror.cc.columbia.edu/pub/software/apache//jmeter/binaries/apache-jmeter-2.12.zip ; \
+/usr/bin/unzip apache-jmeter*.zip ; chmod -R 766 /home/hudson/apache-jmeter*  ; \
+rm *.zip ; mv /home/hudson/apache-jmeter-* /home/hudson/apache-jmeter
+
+# Script 1) starts sshd and httpd (via supervisord), and then 2) run tests
+RUN printf "\
+/usr/bin/supervisord\n\
+cd /home/hudson/hawkular-smoke-test/tests;\n\
+testRunner.sh > /var/www/html/hawkular-test-results/hawkular-test-results.txt\n\
+cd /home/hudson/hawkular-rest-test; mvn test -DbaseUrl="$IP"; yes | cp -rf  ./target/surefire-reports/testng-results.xml /var/www/html/hawkular-test-results\
+" >> /home/hudson/start.sh
+
+RUN chmod 766 /home/hudson/start.sh
 
 USER root
-WORKDIR /home/hudson/hawkular-smoke-test/tests
-CMD /bin/bash /home/hudson/hawkular-smoke-test/tests/testRunner.sh
-#CMD /bin/bash /home/hudson/runTests.sh
+WORKDIR /home/hudson
+CMD /bin/bash /home/hudson/start.sh
 
