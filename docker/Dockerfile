@@ -42,7 +42,7 @@ RUN cd /home/hudson/hawkular-rest-test; mvn clean install -DskipTests
 RUN printf "\
 cd /home/hudson/hawkular-smoke-test/tests;\n\
 testRunner.sh > /var/www/html/hawkular-test-results/hawkular-test-results.txt\n\
-cd /home/hudson/hawkular-rest-test; mvn test -DbaseUrl="http://\$IP"; yes | cp -rf  ./target/surefire-reports/testng-results.xml /var/www/html/hawkular-test-results\
+cd /home/hudson/hawkular-rest-test; mvn test -DbaseUrl="\$IP"; yes | cp -rf  ./target/surefire-reports/testng-results.xml /var/www/html/hawkular-test-results\
 " >> /home/hudson/start.sh
 
 RUN chmod 766 /home/hudson/start.sh
