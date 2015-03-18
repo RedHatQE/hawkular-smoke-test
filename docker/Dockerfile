@@ -3,7 +3,7 @@ MAINTAINER Matt Mahoney <mmahoney@redhat.com> USER root
 
 ENV PATH .:$PATH
 RUN echo "root:redhat" | chpasswd
-RUN yum -y install wget git openssh-server httpd supervisor
+RUN yum -y install wget git openssh-server httpd supervisor ant
 
 RUN groupadd hudson
 RUN useradd -m -g hudson -s /bin/bash hudson
@@ -21,7 +21,7 @@ RUN echo "Hawkular Test Results Directory" > /var/www/html/hawkular-test-results
 RUN printf "\n[supervisord]\nnodaemon=true\n\
 [program:sshd]\ncommand=/bin/bash -c /usr/sbin/sshd\n\
 [program:httpd]\ncommand=/bin/bash -c /usr/sbin/httpd\n" >> /etc/supervisord.conf
-RUN printf "\n[program:hawkuklar-test]\ncommand=/bin/bash /home/hudson/start.sh\n" >> /etc/supervisord.conf
+RUN printf "\n[program:hawkuklar-test]\ncommand=/bin/bash -x /home/hudson/start.sh\n" >> /etc/supervisord.conf
 
 EXPOSE 22 80
 
@@ -30,19 +30,16 @@ WORKDIR /home/hudson
 
 ENV PATH .:$PATH
 RUN git clone https://github.com/RedHatQE/hawkular-smoke-test.git
-RUN git clone https://github.com/redhatqe/hawkular-rest-test
-RUN cd /home/hudson/hawkular-rest-test; mvn clean install -DskipTests
+#RUN git clone https://github.com/redhatqe/hawkular-rest-test
+#RUN cd /home/hudson/hawkular-rest-test; mvn clean install -DskipTests
 
 # Install JMeter
-#RUN cd /home/hudson; wget http://mirror.cc.columbia.edu/pub/software/apache//jmeter/binaries/apache-jmeter-2.12.zip ; \
-#/usr/bin/unzip apache-jmeter*.zip ; chmod -R 766 /home/hudson/apache-jmeter*  ; \
-#rm *.zip ; mv /home/hudson/apache-jmeter-* /home/hudson/apache-jmeter
+RUN cd /home/hudson; git clone https://github.com/apache/jmeter.git; cd jmeter; ant download_jars; ant
 
 # Script Run tests
 RUN printf "\
 cd /home/hudson/hawkular-smoke-test/tests;\n\
 testRunner.sh > /var/www/html/hawkular-test-results/hawkular-test-results.txt\n\
-cd /home/hudson/hawkular-rest-test; mvn test -DbaseUrl="\$IP"; yes | cp -rf  ./target/surefire-reports/testng-results.xml /var/www/html/hawkular-test-results\
 " >> /home/hudson/start.sh
 
 RUN chmod 766 /home/hudson/start.sh
