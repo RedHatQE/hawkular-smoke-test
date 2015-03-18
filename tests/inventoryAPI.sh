@@ -1,6 +1,7 @@
 #!/bin/bash
 
 ip=$1
+echo "IP: $IP"
 exitcode="1"
 
 if [ -z "$ip" ]
@@ -11,7 +12,7 @@ fi
 expectedID=`cat inventory.json | grep "id.*:" | awk '$0 {print $2}' | cut -d "," -f1`
 echo "expectedID: $expectedID"
 
-reply=`curl -X POST "http://$ip/hawkular/inventory/test1/resources" -d@inventory.json -HContent-Type:application/json`
+reply=`curl -X POST "$ip/hawkular/inventory/test1/resources" -d@inventory.json -HContent-Type:application/json`
 result=$?
 if [ "$result" == "0" ] || [ "$reply" == *"$expectedID"* ]
 then
