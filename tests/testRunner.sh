@@ -45,10 +45,11 @@ echo "testList: $testList"
 
 for test in $testList
 do
-    echo "Checking test: $tes"
+    #echo "Checking test: $tes"
     if [[ "$test" == *"$prog"* ]]
     then
-        echo "Skipping: $test"
+        #echo "Skipping: $test"
+        echo ""
     else
     cmd="$test $ip"
         echo "Running test: $cmd"
