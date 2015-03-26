@@ -12,7 +12,7 @@ fi
 echo "Title: $title"
 echo "IP:  $ip"
 
-for run in {1..10}
+for run in {1..25}
 do
     curl "$ip" | grep "$title"
     result=$?
