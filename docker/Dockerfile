@@ -30,16 +30,21 @@ WORKDIR /home/hudson
 
 ENV PATH .:$PATH
 RUN git clone https://github.com/RedHatQE/hawkular-smoke-test.git
-#RUN git clone https://github.com/redhatqe/hawkular-rest-test
-#RUN cd /home/hudson/hawkular-rest-test; mvn clean install -DskipTests
 
 # Install JMeter
 RUN cd /home/hudson; git clone https://github.com/apache/jmeter.git; cd jmeter; ant download_jars; ant
 
+# Install Hakular Sauce Labs tests
+RUN git clone https://github.com/ahovsepy/hawkular-ui-test.git
+RUN cd hawkular-ui-test; mvn clean install -DskipTests
+RUN printf "1=firefox:24.0:Linux" > /home/hudson/hawkular-ui-test/src/test/resources/browserAndOs.properties
+
 # Script Run tests
 RUN printf "\
 cd /home/hudson/hawkular-smoke-test/tests;\n\
-testRunner.sh > /var/www/html/hawkular-test-results/hawkular-test-results.txt\n\
+testRunner.sh > /var/www/html/hawkular-test-results/script-test-results.txt;\n\
+sleep 4m;\n\
+cd /home/hudson/hawkular-ui-test;  mvn test -DhawkularUrl=\$IP; cp /home/hudson/hawkular-ui-test/target/surefire-reports/testng-results.xml /var/www/html/hawkular-test-results/ui-test-results.xml\n\
 " >> /home/hudson/start.sh
 
 RUN chmod 766 /home/hudson/start.sh
