@@ -6,6 +6,7 @@ prog="testRunner.sh"
 # Default is to run all tests.
 
 exitcode="0"
+testList="isURLBrowsable.sh inventoryAPI.sh"
 
 while [[ $# > 1 ]]
 do
@@ -34,11 +35,6 @@ done
 if [ -n "$IP" ]
 then
     ip=$IP
-fi
-
-if [ -z "$testList" ]
-then
-    testList=`ls *.sh`
 fi
 
 echo "testList: $testList"

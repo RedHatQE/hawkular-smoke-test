@@ -44,8 +44,8 @@ RUN printf "\
 sleep 2m;\n\
 cd /home/hudson/hawkular-smoke-test/tests;\n\
 testRunner.sh > /var/www/html/hawkular-test-results/script-test-results.txt;\n\
-sleep 4m;\n\
-cd /home/hudson/hawkular-ui-test;  mvn test -DhawkularUrl=\$IP; cp /home/hudson/hawkular-ui-test/target/surefire-reports/testng-results.xml /var/www/html/hawkular-test-results/ui-test-results.xml\n\
+#sleep 4m;\n\
+#cd /home/hudson/hawkular-ui-test;  mvn test -DhawkularUrl=\$IP; cp /home/hudson/hawkular-ui-test/target/surefire-reports/testng-results.xml /var/www/html/hawkular-test-results/ui-test-results.xml\n\
 " >> /home/hudson/start.sh
 
 RUN chmod 766 /home/hudson/start.sh
