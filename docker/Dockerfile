@@ -41,6 +41,7 @@ RUN printf "1=firefox:24.0:Linux" > /home/hudson/hawkular-ui-test/src/test/resou
 
 # Script Run tests
 RUN printf "\
+sleep 2m;\n\
 cd /home/hudson/hawkular-smoke-test/tests;\n\
 testRunner.sh > /var/www/html/hawkular-test-results/script-test-results.txt;\n\
 sleep 4m;\n\
