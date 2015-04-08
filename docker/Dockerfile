@@ -42,7 +42,6 @@ RUN printf "1=firefox:24.0:Linux" > /home/hudson/hawkular-ui-test/src/test/resou
 # Script Run tests
 RUN printf "\
 echo IP \$IP >> /var/www/html/hawkular-test-results/hawkular-debug-info.txt\n\
-echo AUTH_KEY \$AUTH_KEY >> /var/www/html/hawkular-test-results/hawkular-debug-info.txt\n\
 sleep 2m;\n\
 cd /home/hudson/hawkular-smoke-test/tests;\n\
 testRunner.sh > /var/www/html/hawkular-test-results/script-test-results.txt;\n\
