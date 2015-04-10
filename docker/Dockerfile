@@ -22,7 +22,7 @@ RUN tar -xvf apache-ant-1.9.4-bin.tar.gz; rm apache-ant-1.9.4-bin.tar.gz
 ENV PATH /usr/lib/apache-ant-1.9.4/bin:$PATH
 ENV ANT_HOME /usr/lib/apache-ant-1.9.4
 
-RUN mkdir -p /var/www/html/hawkular-test-results; chmod 777 /var/www/html/hawkular-test-results
+RUN mkdir -p /var/www/html/hawkular-test-results/debug; chmod -R 777 /var/www/html/hawkular-test-results/debug
 RUN echo "Hawkular Test Results Directory" > /var/www/html/hawkular-test-results/Hawkular-README.txt
 
 RUN printf "\n[supervisord]\nnodaemon=true\n\
@@ -52,15 +52,16 @@ RUN cd hawkular-java-client; mvn clean install -DskipTests
 
 # Create start script to run tests
 RUN printf "\
+"#!"/bin/bash\n\
 export HAWKULAR_ENDPOINT=\$IP\n\
-echo IP \$IP >> /var/www/html/hawkular-test-results/hawkular-debug-info.txt\n\
-echo HAWKULAR_ENDPOINT \$HAWKULAR_ENDPOINT >> /var/www/html/hawkular-test-results/hawkular-debug-info.txt\n\
+echo IP \$IP >> /var/www/html/hawkular-test-results/debug/debug-info.txt\n\
+echo HAWKULAR_ENDPOINT \$HAWKULAR_ENDPOINT >> /var/www/html/hawkular-test-results/debug/debug-info.txt\n\
 sleep 2m;\n\
 cd /home/hudson/hawkular-smoke-test/tests;\n\
 testRunner.sh > /var/www/html/hawkular-test-results/script-test-results.txt;\n\
 sleep 4m;\n\
-cd /home/hudson/hawkular-ui-test;  mvn test -DhawkularUrl=\$IP -DauthenticationKey=\$AUTH_KEY; cp /home/hudson/hawkular-ui-test/target/surefire-reports/testng-results.xml /var/www/html/hawkular-test-results/ui-test-results.xml; cp /home/hudson/hawkular-ui-test/target/surefire-reports/emailable-report.html /var/www/html/hawkular-test-results/ui-test-results.html\n\
-cd /home/hudson/hawkular-java-client; mvn clean test -Pci; cp /home/hudson/hawkular-java-client/target/surefire-reports/testng-results.xml /var/www/html/hawkular-test-results/rest-client-results.xml; cp /home/hudson/hawkular-java-client/target/surefire-reports/emailable-report.html /var/www/html/hawkular-test-results/rest-client-results.html\n\
+cd /home/hudson/hawkular-ui-test; mvn test -DhawkularUrl=\$IP -DauthenticationKey=\$AUTH_KEY > /var/www/html/hawkular-test-results/debug/ui-debug.txt 2>&1; cp /home/hudson/hawkular-ui-test/target/surefire-reports/testng-results.xml /var/www/html/hawkular-test-results/ui-test-results.xml; cp /home/hudson/hawkular-ui-test/target/surefire-reports/emailable-report.html /var/www/html/hawkular-test-results/ui-test-results.html\n\
+cd /home/hudson/hawkular-java-client; mvn clean test -Pci > /var/www/html/hawkular-test-results/debug/client-rest-debug.txt 2>&1; cp /home/hudson/hawkular-java-client/target/surefire-reports/testng-results.xml /var/www/html/hawkular-test-results/rest-client-results.xml; cp /home/hudson/hawkular-java-client/target/surefire-reports/emailable-report.html /var/www/html/hawkular-test-results/rest-client-results.html\n\
 " >> /home/hudson/start.sh
 
 RUN chmod 766 /home/hudson/start.sh
