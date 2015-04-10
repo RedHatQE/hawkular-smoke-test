@@ -3,7 +3,7 @@ MAINTAINER Matt Mahoney <mmahoney@redhat.com> USER root
 
 ENV PATH .:$PATH
 RUN echo "root:redhat" | chpasswd
-RUN yum -y install wget git openssh-server httpd supervisor ant
+RUN yum -y install wget git openssh-server httpd supervisor
 
 RUN groupadd hudson
 RUN useradd -m -g hudson -s /bin/bash hudson
@@ -14,6 +14,13 @@ RUN ssh-keygen -A
 RUN sed -ri 's/#PermitRootLogin yes/PermitRootLogin yes/g' /etc/ssh/sshd_config
 RUN sed -ri 's/UsePAM yes/#UsePAM yes/g' /etc/ssh/sshd_config
 RUN sed -ri 's/#UsePAM no/UsePAM no/g' /etc/ssh/sshd_config
+
+# Install ant
+WORKDIR /usr/lib
+RUN wget http://archive.apache.org/dist/ant/binaries/apache-ant-1.9.4-bin.tar.gz
+RUN tar -xvf apache-ant-1.9.4-bin.tar.gz; rm apache-ant-1.9.4-bin.tar.gz
+ENV PATH /usr/lib/apache-ant-1.9.4/bin:$PATH
+ENV ANT_HOME /usr/lib/apache-ant-1.9.4
 
 RUN mkdir -p /var/www/html/hawkular-test-results; chmod 777 /var/www/html/hawkular-test-results
 RUN echo "Hawkular Test Results Directory" > /var/www/html/hawkular-test-results/Hawkular-README.txt
@@ -39,14 +46,21 @@ RUN git clone https://github.com/ahovsepy/hawkular-ui-test.git
 RUN cd hawkular-ui-test; mvn clean install -DskipTests
 RUN printf "1=firefox:24.0:Linux" > /home/hudson/hawkular-ui-test/src/test/resources/browserAndOs.properties
 
+# Install Hawkular Java Client - Run tests - Runs against localhost:8080
+RUN git clone https://github.com/Hawkular-QE/hawkular-java-client.git
+RUN cd hawkular-java-client; mvn clean install -DskipTests
+
 # Create start script to run tests
 RUN printf "\
+export HAWKULAR_ENDPOINT=\$IP\n\
 echo IP \$IP >> /var/www/html/hawkular-test-results/hawkular-debug-info.txt\n\
+echo HAWKULAR_ENDPOINT \$HAWKULAR_ENDPOINT >> /var/www/html/hawkular-test-results/hawkular-debug-info.txt\n\
 sleep 2m;\n\
 cd /home/hudson/hawkular-smoke-test/tests;\n\
 testRunner.sh > /var/www/html/hawkular-test-results/script-test-results.txt;\n\
 sleep 4m;\n\
 cd /home/hudson/hawkular-ui-test;  mvn test -DhawkularUrl=\$IP -DauthenticationKey=\$AUTH_KEY; cp /home/hudson/hawkular-ui-test/target/surefire-reports/testng-results.xml /var/www/html/hawkular-test-results/ui-test-results.xml; cp /home/hudson/hawkular-ui-test/target/surefire-reports/emailable-report.html /var/www/html/hawkular-test-results/ui-test-results.html\n\
+cd /home/hudson/hawkular-java-client; mvn clean test -Pci; cp /home/hudson/hawkular-java-client/target/surefire-reports/testng-results.xml /var/www/html/hawkular-test-results/rest-client-results.xml; cp /home/hudson/hawkular-java-client/target/surefire-reports/emailable-report.html /var/www/html/hawkular-test-results/rest-client-results.html\n\
 " >> /home/hudson/start.sh
 
 RUN chmod 766 /home/hudson/start.sh
