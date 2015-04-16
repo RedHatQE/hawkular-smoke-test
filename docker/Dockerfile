@@ -1,8 +1,6 @@
 FROM hawkular/docker-maven
 MAINTAINER Matt Mahoney <mmahoney@redhat.com> USER root
-
-ENV PATH .:$PATH
-RUN echo "root:redhat" | chpasswd
+ENV PATH .:$PATH RUN echo "root:redhat" | chpasswd
 RUN yum -y install wget git openssh-server httpd supervisor
 
 RUN groupadd hudson
@@ -48,7 +46,7 @@ RUN printf "1=firefox:24.0:Linux" > /home/hudson/hawkular-ui-test/src/test/resou
 
 # Install Hawkular Java Client - Run tests - Runs against localhost:8080
 RUN git clone https://github.com/Hawkular-QE/hawkular-java-client.git
-RUN cd hawkular-java-client; mvn clean install -DskipTests
+RUN cd hawkular-java-client; mvn clean install -DskipTests dependency:go-offline
 
 # Create start script to run tests
 RUN printf "\
@@ -56,6 +54,7 @@ RUN printf "\
 export HAWKULAR_ENDPOINT=\$IP\n\
 echo IP \$IP >> /var/www/html/hawkular-test-results/debug/debug-info.txt\n\
 echo HAWKULAR_ENDPOINT \$HAWKULAR_ENDPOINT >> /var/www/html/hawkular-test-results/debug/debug-info.txt\n\
+df >> /var/www/html/hawkular-test-results/debug/debug-info.txt\n\
 sleep 2m;\n\
 cd /home/hudson/hawkular-smoke-test/tests;\n\
 testRunner.sh > /var/www/html/hawkular-test-results/script-test-results.txt;\n\
