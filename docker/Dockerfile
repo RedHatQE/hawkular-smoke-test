@@ -60,7 +60,7 @@ cd /home/hudson/hawkular-smoke-test/tests;\n\
 testRunner.sh > /var/www/html/hawkular-test-results/script-test-results.txt;\n\
 sleep 4m;\n\
 cd /home/hudson/hawkular-ui-test; mvn test -DhawkularUrl=\$IP -DauthenticationKey=\$AUTH_KEY > /var/www/html/hawkular-test-results/debug/ui-debug.txt 2>&1; cp /home/hudson/hawkular-ui-test/target/surefire-reports/testng-results.xml /var/www/html/hawkular-test-results/ui-test-results.xml; cp /home/hudson/hawkular-ui-test/target/surefire-reports/emailable-report.html /var/www/html/hawkular-test-results/ui-test-results.html\n\
-cd /home/hudson/hawkular-java-client; mvn -U test -Pci > /var/www/html/hawkular-test-results/debug/rest-client-debug.txt 2>&1; cp /home/hudson/hawkular-java-client/target/surefire-reports/testng-results.xml /var/www/html/hawkular-test-results/rest-client-results.xml; cp /home/hudson/hawkular-java-client/target/surefire-reports/emailable-report.html /var/www/html/hawkular-test-results/rest-client-results.html\n\
+"#"cd /home/hudson/hawkular-java-client; mvn -U test -Pci > /var/www/html/hawkular-test-results/debug/rest-client-debug.txt 2>&1; cp /home/hudson/hawkular-java-client/target/surefire-reports/testng-results.xml /var/www/html/hawkular-test-results/rest-client-results.xml; cp /home/hudson/hawkular-java-client/target/surefire-reports/emailable-report.html /var/www/html/hawkular-test-results/rest-client-results.html\n\
 " >> /home/hudson/start.sh
 
 RUN chmod 766 /home/hudson/start.sh
